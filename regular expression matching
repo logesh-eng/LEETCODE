@@ -1,0 +1,38 @@
+class Solution(object):
+    def isMatch(self, s, p):
+        """
+        :type s: str
+        :type p: str
+        :rtype: bool
+        """
+        # Memoization dictionary to store calculated subproblem results
+        memo = {}
+
+        def dp(i, j):
+            # If this subproblem was already computed, return the cached result
+            if (i, j) in memo:
+                return memo[(i, j)]
+            
+            # Base Case: If we reach the end of the pattern
+            if j == len(p):
+                return i == len(s)
+
+            # Check if the current characters match
+            first_match = i < len(s) and (p[j] == s[i] or p[j] == '.')
+
+            # Case 1: The next character is a '*' wildcard
+            if j + 1 < len(p) and p[j + 1] == '*':
+                # We have two choices:
+                # 1. Ignore the '*' and its preceding element (dp(i, j + 2))
+                # 2. Use the '*' if current characters match, moving to the next character in 's' (dp(i + 1, j))
+                ans = dp(i, j + 2) or (first_match and dp(i + 1, j))
+            
+            # Case 2: No '*' wildcard following the current pattern character
+            else:
+                ans = first_match and dp(i + 1, j + 1)
+
+            # Cache and return the result
+            memo[(i, j)] = ans
+            return ans
+
+        return dp(0, 0)
